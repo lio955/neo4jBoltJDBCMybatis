@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ing.lu.accessor.BoltMapper">
+    <select id="selectPerson" resultType="com.ing.lu.accessor.Person">
+        MATCH (n:Person) RETURN n.born as born, n.name as name LIMIT 25
+    </select>
+
+    <select id="monsterQuery" resultType="java.util.LinkedHashMap">
+        MATCH
+        (c:Customer {custNo: '1234567890'})-[rco:SUPPORTED_BY]->(o:OrgUnit)&lt;-[roe:MEMBER_OF]-(e:Employee)
+        WHERE
+        COALESCE(rco.validFrom, 0) &lt;= timestamp()
+        AND timestamp() &lt;= COALESCE(rco.validTo, timestamp())
+        AND COALESCE(roe.validFrom, 0) &lt;= timestamp()
+        AND timestamp() &lt;= COALESCE(roe.validTo, timestamp())
+        OPTIONAL MATCH
+        (c)-[rcn:NAMED_BY]->(cn:Name)
+        WHERE
+        COALESCE(rcn.validFrom, 0) &lt;= timestamp()
+        AND timestamp() &lt;= COALESCE(rcn.validTo, timestamp())
+        OPTIONAL MATCH
+        (o)-[ron:NAMED_BY]->(on:Name)
+        WHERE
+        COALESCE(ron.validFrom, 0) &lt;= timestamp()
+        AND timestamp() &lt;= COALESCE(ron.validTo, timestamp())
+        OPTIONAL MATCH
+        (e)-[ren:NAMED_BY]->(en:Name)
+        WHERE
+        COALESCE(ren.validFrom, 0) &lt;= timestamp()
+        AND timestamp() &lt;= COALESCE(ren.validTo, timestamp())
+        OPTIONAL MATCH
+        (o)-[roa:LOCATED_AT]->(oa:Address)
+        WHERE
+        COALESCE(roa.validFrom, 0) &lt;= timestamp()
+        AND timestamp() &lt;= COALESCE(roa.validTo, timestamp())
+        OPTIONAL MATCH
+        (e)-[rea:LOCATED_AT]->(ea:Address)
+        WHERE
+        COALESCE(rea.validFrom, 0) &lt;= timestamp()
+        AND timestamp() &lt;= COALESCE(rea.validTo, timestamp())
+        WITH
+        c AS c,
+        cn AS cn,
+        o AS o,
+        on AS on,
+        CASE WHEN oa IS NOT NULL THEN
+        COLLECT(DISTINCT
+        {
+        type: oa.type,
+        data: oa.data
+        }
+        )
+        ELSE
+        []
+        END AS oas,
+        e AS e,
+        en AS en,
+        CASE WHEN ea IS NOT NULL THEN
+        COLLECT(DISTINCT
+        {
+        type: ea.type,
+        data: ea.data
+        }
+        )
+        ELSE
+        []
+        END AS eas
+        WITH
+        c AS c,
+        cn AS cn,
+        o AS o,
+        on AS on,
+        oas AS oas,
+        CASE WHEN e IS NOT NULL THEN
+        COLLECT( DISTINCT
+        {
+        empNo: e.empNo,
+        name:
+        CASE WHEN EXISTS(en.name) THEN
+        en.name
+        ELSE
+        ''
+        END,
+        addresses: eas
+        }
+        )
+        ELSE
+        []
+        END AS es
+        RETURN
+        {
+        custNo: c.custNo,
+        name:
+        CASE WHEN EXISTS(cn.name) THEN
+        cn.name
+        ELSE
+        ''
+        END,
+        supportTeams:
+        CASE WHEN o IS NOT NULL THEN
+        COLLECT( DISTINCT
+        {
+        shortName: o.shortName,
+        name:
+        CASE WHEN EXISTS(on.name) THEN
+        on.name
+        ELSE
+        ''
+        END,
+        addresses: oas,
+        members: es
+        }
+        )
+        ELSE
+        []
+        END
+        } AS `customer`
+    </select>
+</mapper>
