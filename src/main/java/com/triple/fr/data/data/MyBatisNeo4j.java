@@ -1,4 +1,4 @@
-package com.ing.lu.data;
+package fr.triple.data.data;
 
 import java.util.List;
 

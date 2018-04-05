@@ -1,4 +1,4 @@
-package com.ing.lu.data;
+package fr.triple.data.data;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

@@ -1,4 +1,4 @@
-package com.ing.lu.accessor;
+package fr.triple.data.accessor;
 
 import java.util.List;
 

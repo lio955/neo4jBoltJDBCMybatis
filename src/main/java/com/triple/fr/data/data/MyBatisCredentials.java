@@ -1,4 +1,4 @@
-package com.ing.lu.data;
+package fr.triple.data.data;
 
 /**
  * Created by lp501 on 01/12/2016.

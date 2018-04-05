@@ -1,4 +1,4 @@
-package com.ing.lu.accessor;
+package fr.triple.data.accessor;
 
 /**
  * Created by lionel on 17/03/17.

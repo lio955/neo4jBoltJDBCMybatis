@@ -1,4 +1,4 @@
-package com.ing.lu.data;
+package fr.triple.data.data;
 
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.io.Resources;
